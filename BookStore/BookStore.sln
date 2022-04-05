@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32228.343
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookStore", "BookStore\BookStore.csproj", "{271CEC27-C002-49AD-B8B0-7537C3F260C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookStore", "BookStore\BookStore.csproj", "{271CEC27-C002-49AD-B8B0-7537C3F260C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{87967241-7F9D-489D-A2D5-C134D8F23157}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{87967241-7F9D-489D-A2D5-C134D8F23157}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommomLayer", "CommomLayer\CommomLayer.csproj", "{997F9AD4-57CF-4FFF-AB7B-0857E8AF3D32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonLayer", "CommomLayer\CommonLayer.csproj", "{997F9AD4-57CF-4FFF-AB7B-0857E8AF3D32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryLayer", "RepositoryLayer\RepositoryLayer.csproj", "{FD99151B-3252-46A8-A3C1-F6B4DFE82189}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepositoryLayer", "RepositoryLayer\RepositoryLayer.csproj", "{FD99151B-3252-46A8-A3C1-F6B4DFE82189}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
