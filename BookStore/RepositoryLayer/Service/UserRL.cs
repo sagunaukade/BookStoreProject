@@ -127,5 +127,69 @@ namespace RepositoryLayer.Service
                 signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public string ForgotPassword(string email)
+        {
+            try
+            {
+                this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStore"]);
+                SqlCommand com = new SqlCommand("UserForgotPassword", this.sqlConnection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                com.Parameters.AddWithValue("@Email", email);
+                this.sqlConnection.Open();
+                SqlDataReader rd = com.ExecuteReader();
+                if (rd.HasRows)
+                {
+                    int userId = 0;
+                    while (rd.Read())
+                    {
+                        email = Convert.ToString(rd["Email"] == DBNull.Value ? default : rd["Email"]);
+                        userId = Convert.ToInt32(rd["UserId"] == DBNull.Value ? default : rd["UserId"]);
+                    }
+
+                    this.sqlConnection.Close();
+                    var token = this.GenerateJWTTokenForPassword(email, userId);
+                    new MsmqModel().Sender(token);
+                    return token;
+                }
+                else
+                {
+                    this.sqlConnection.Close();
+                    return null;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
+        public string GenerateJWTTokenForPassword(string email, int userId)
+        {
+            // header
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Jwt:SecretKey"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            // payload
+            var claims = new[]
+            {
+                new Claim("Email", email),
+                new Claim("Id", userId.ToString()),
+            };
+
+            // signature
+            var token = new JwtSecurityToken(
+                this.Configuration["Jwt:Issuer"],
+                this.Configuration["Jwt:Issuer"],
+                claims,
+                expires: DateTime.Now.AddMinutes(60),
+                signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }
