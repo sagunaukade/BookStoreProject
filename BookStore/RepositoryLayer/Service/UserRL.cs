@@ -14,7 +14,10 @@ namespace RepositoryLayer.Service
 {
     public class UserRL : IUserRL
     {
+
         private SqlConnection sqlConnection;
+
+
         public UserRL(IConfiguration configuration)
         {
             this.Configuration = configuration;
