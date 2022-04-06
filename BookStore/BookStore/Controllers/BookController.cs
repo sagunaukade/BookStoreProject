@@ -79,6 +79,27 @@ namespace BookStore.Controllers
             }
         }
 
+        [HttpGet("{BookId}/Get")]
+        public IActionResult GetBookByBookId(int BookId)
+        {
+            try
+            {
+                var book = this.bookBL.GetBookByBookId(BookId);
+                if (book != null)
+                {
+                    return this.Ok(new { Success = true, message = "Book Detail Fetched Sucessfully", Response = book });
+                }
+                else
+                {
+                    return this.BadRequest(new { Success = false, message = "Enter Correct Book Id" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, message = ex.Message });
+            }
+        }
     }
 }
+
             
