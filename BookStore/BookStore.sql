@@ -122,3 +122,14 @@ BookDetails = @BookDetails,
 bookImage =@bookImage
 where bookId = @bookId;
 End;
+
+---Procedure to deletebook
+create procedure DeleteBook
+(
+@bookId int
+)
+as
+BEGIN
+Delete Books 
+where bookId = @bookId;
+End;

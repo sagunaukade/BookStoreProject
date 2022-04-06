@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace BookStore.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
     public class BookController : ControllerBase
@@ -18,7 +17,7 @@ namespace BookStore.Controllers
         {
             this.bookBL = bookBL;
         }
-        [HttpPost("Add")]
+        [HttpPost("AddBook")]
         public IActionResult AddBook(BookModel book)
         {
             try
@@ -47,11 +46,11 @@ namespace BookStore.Controllers
                 var user = this.bookBL.UpdateBook(update);
                 if (user != null)
                 {
-                    return this.Ok(new { Success = true, message = "Book Details Updated", });
+                    return this.Ok(new { Success = true, message = "Book Details Updated Successfully", });
                 }
                 else
                 {
-                    return this.BadRequest(new { Success = false, message = "Book Update Failed" });
+                    return this.BadRequest(new { Success = false, message = "Book details Updated Unsuccessfully" });
                 }
             }
             catch (Exception ex)
@@ -59,6 +58,27 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { Success = false, message = ex.Message });
             }
         }
+
+        [HttpDelete("DeleteBook")]
+        public IActionResult DeleteBook(int bookId)
+        {
+            try
+            {
+                if (this.bookBL.DeleteBook(bookId))
+                {
+                    return this.Ok(new { Success = true, message = "Book Deleted Sucessfully" });
+                }
+                else
+                {
+                    return this.BadRequest(new { Success = false, message = "Enter Valid Book Id" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, message = ex.Message });
+            }
+        }
+
     }
 }
             
