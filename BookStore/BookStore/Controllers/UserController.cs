@@ -1,5 +1,4 @@
 ﻿using BusinessLayer.Interface;
-using CommomLayer.Model;
 using CommonLayer.Model;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -70,6 +69,27 @@ namespace BookStore.Controllers
                 else
                 {
                     return this.BadRequest(new { Success = false, message = "Enter Valid Email" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPut("ResetPassword")]
+        public IActionResult ResetPassword(string newPassword, string confirmPassword)
+        {
+            try
+            {
+                var email = User.Claims.FirstOrDefault(e => e.Type == "Email").Value.ToString();
+                if (this.userBL.ResetPassword(email, newPassword, confirmPassword))
+                {
+                    return this.Ok(new { Success = true, message = " Password Changed Successfully " });
+                }
+                else
+                {
+                    return this.BadRequest(new { Success = false, message = " Password Change Unsuccessfully " });
                 }
             }
             catch (Exception ex)

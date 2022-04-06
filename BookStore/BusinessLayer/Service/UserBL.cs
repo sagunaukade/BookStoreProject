@@ -1,5 +1,4 @@
 ﻿using BusinessLayer.Interface;
-using CommomLayer.Model;
 using CommonLayer.Model;
 using RepositoryLayer.Interface;
 using System;
@@ -44,6 +43,18 @@ namespace BusinessLayer.Service
             try
             {
                 return this.userRL.ForgotPassword(email);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public bool ResetPassword(string email, string newPassword, string confirmPassword)
+        {
+            try
+            {
+                return this.userRL.ResetPassword(email, newPassword, confirmPassword);
             }
             catch (Exception)
             {

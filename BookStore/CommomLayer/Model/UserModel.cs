@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommomLayer.Model
+namespace CommonLayer.Model
 {
     public class UserModel
     {

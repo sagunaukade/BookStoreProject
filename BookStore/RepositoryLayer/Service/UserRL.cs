@@ -1,5 +1,4 @@
-﻿using CommomLayer.Model;
-using CommonLayer.Model;
+﻿using CommonLayer.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using RepositoryLayer.Interface;
@@ -15,19 +14,12 @@ namespace RepositoryLayer.Service
 {
     public class UserRL : IUserRL
     {
-
         private SqlConnection sqlConnection;
-
-
         public UserRL(IConfiguration configuration)
         {
             this.Configuration = configuration;
         }
-
-
         private IConfiguration Configuration { get; }
-
-
         public UserModel Register(UserModel user)
         {
             try
@@ -191,5 +183,46 @@ namespace RepositoryLayer.Service
                 signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public bool ResetPassword(string email, string newPassword, string confirmPassword)
+        {
+            try
+            {
+                if (newPassword == confirmPassword)
+                {
+                    this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStore"]);
+                    SqlCommand com = new SqlCommand("UserResetPassword", this.sqlConnection)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    com.Parameters.AddWithValue("@Email", email);
+                    com.Parameters.AddWithValue("@Password", confirmPassword);
+                    this.sqlConnection.Open();
+                    int i = com.ExecuteNonQuery();
+                    this.sqlConnection.Close();
+                    if (i >= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
     }
 }
+    

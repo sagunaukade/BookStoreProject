@@ -29,7 +29,6 @@ namespace CommonLayer.Model
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
