@@ -8,6 +8,6 @@ namespace BusinessLayer.Interface
     public interface IBookBL
     {
         public BookModel AddBook(BookModel book);
-
+        public UpdateBook UpdateBook(UpdateBook update);
     }
 }

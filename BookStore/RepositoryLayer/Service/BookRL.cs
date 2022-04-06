@@ -57,6 +57,44 @@ namespace RepositoryLayer.Service
                 this.sqlConnection.Close();
             }
         }
+        public UpdateBook UpdateBook(UpdateBook update)
+        {
+            try
+            {
+                this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BooKStore"]);
+                SqlCommand com = new SqlCommand("UpdateBook", this.sqlConnection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                com.Parameters.AddWithValue("@BookId", update.BookId);
+                com.Parameters.AddWithValue("@BookName", update.BookName);
+                com.Parameters.AddWithValue("@AuthorName", update.AuthorName);
+                com.Parameters.AddWithValue("@OriginalPrice", update.OriginalPrice);
+                com.Parameters.AddWithValue("@DiscountPrice", update.DiscountPrice);
+                com.Parameters.AddWithValue("@BookDetails", update.BookDetails);
+                com.Parameters.AddWithValue("@BookImage", update.BookImage);
+
+                this.sqlConnection.Open();
+                int i = com.ExecuteNonQuery();
+                this.sqlConnection.Close();
+                if (i >= 1)
+                {
+                    return update;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
     }
 }
         

@@ -25,6 +25,18 @@ namespace BusinessLayer.Service
                 throw;
             }
         }
+
+        public UpdateBook UpdateBook(UpdateBook update)
+        {
+            try
+            {
+                return this.bookRL.UpdateBook(update);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
            
