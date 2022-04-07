@@ -133,3 +133,61 @@ BEGIN
 Delete Books 
 where bookId = @bookId;
 End;
+
+---create procedure to getbookbybookid
+create procedure GetBookByBookId
+(
+@bookId int
+)
+as
+BEGIN
+select * from Books
+where bookId = @bookId;
+End;
+
+---Create cart table
+create Table Carts
+(
+CartId INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+Quantity INT default 1,
+UserId INT FOREIGN KEY REFERENCES Users(UserId),
+BookId INT FOREIGN KEY REFERENCES Books(BookId) 
+);
+drop table Carts
+select * from Carts;
+
+---create procedure to addcart
+Alter Proc AddCart
+(
+@Quantity int,
+@UserId int,
+@BookId int
+
+)
+as
+BEGIN
+if(Exists (select * from Books where bookId = @BookId))
+begin
+Insert Into Carts (Quantity,UserId, BookId)
+Values (@Quantity,@UserId, @BookId);
+end
+else
+begin
+select 1
+end			 
+End;
+
+---create procedure to UpdateCart
+create procedure UpdateCart
+(
+@Quantity int,
+@BookId int,
+@CartId int
+)
+as
+BEGIN
+update Carts 
+set BookId = @BookId,
+Quantity = @Quantity 
+where CartId = @CartId;
+End;

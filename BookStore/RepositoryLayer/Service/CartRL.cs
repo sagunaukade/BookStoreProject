@@ -52,5 +52,41 @@ namespace RepositoryLayer.Service
                 this.sqlConnection.Close();
             }
         }
+
+        public CartModel UpdateCart(CartModel cart, int userId)
+        {
+            try
+            {
+                this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStore"]);
+                SqlCommand cmd = new SqlCommand("UpdateCart", this.sqlConnection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                cmd.Parameters.AddWithValue("@Quantity", cart.Quantity);
+                cmd.Parameters.AddWithValue("@BookId", cart.BookId);
+               // cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@CartId", cart.CartId);
+                this.sqlConnection.Open();
+                int i = cmd.ExecuteNonQuery();
+                this.sqlConnection.Close();
+                if (i >= 1)
+                {
+                    return cart;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
     }
 }

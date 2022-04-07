@@ -26,11 +26,33 @@ namespace BookStore.Controllers
                 var cartData = this.cartBL.AddCart(cart, userId);
                 if (cartData != null)
                 {
-                    return this.Ok(new { success = true, message = "Book Added in Cart ", response = cartData });
+                    return this.Ok(new { success = true, message = "Book Added SuccessFully in Cart ", response = cartData });
                 }
                 else
                 {
-                    return this.BadRequest(new { Success = false, message = "cart Add failed" });
+                    return this.BadRequest(new { Success = false, message = "Cart Added Unsuccessfully" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, response = ex.Message });
+            }
+        }
+
+        [HttpPut("UpdateCart")]
+        public IActionResult UpdateCart(CartModel cart)
+        {
+            try
+            {
+                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                var cartData = this.cartBL.UpdateCart(cart, userId);
+                if (cartData != null)
+                {
+                    return this.Ok(new { success = true, message = "Book Updated in Cart ", response = cartData });
+                }
+                else
+                {
+                    return this.BadRequest(new { Success = false, message = "cart Update failed" });
                 }
             }
             catch (Exception ex)
@@ -40,5 +62,6 @@ namespace BookStore.Controllers
         }
     }
 }
+    
     
            
