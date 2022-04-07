@@ -133,14 +133,3 @@ BEGIN
 Delete Books 
 where bookId = @bookId;
 End;
-
----create procedure to getbookbybookid
-create procedure GetBookByBookId
-(
-@bookId int
-)
-as
-BEGIN
-select * from Books
-where bookId = @bookId;
-End;
