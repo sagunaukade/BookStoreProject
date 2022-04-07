@@ -191,3 +191,16 @@ set BookId = @BookId,
 Quantity = @Quantity 
 where CartId = @CartId;
 End;
+
+---Create procedure to deletecart
+Alter procedure DeleteCart
+(
+@CartId int
+--@UserId int
+)
+as
+BEGIN
+Delete Carts 
+where CartId = @CartId 
+--and UserId = @UserId;; 
+End;

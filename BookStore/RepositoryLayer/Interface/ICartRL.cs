@@ -9,6 +9,8 @@ namespace RepositoryLayer.Interface
     {
         public CartModel AddCart(CartModel cart, int userId);
         public CartModel UpdateCart(CartModel cart, int userId);
+        public bool DeleteCart(int cartId, int userId);
+
 
 
     }

@@ -48,11 +48,32 @@ namespace BookStore.Controllers
                 var cartData = this.cartBL.UpdateCart(cart, userId);
                 if (cartData != null)
                 {
-                    return this.Ok(new { success = true, message = "Book Updated in Cart ", response = cartData });
+                    return this.Ok(new { success = true, message = "Book Updated Successfully in Cart ", response = cartData });
                 }
                 else
                 {
-                    return this.BadRequest(new { Success = false, message = "cart Update failed" });
+                    return this.BadRequest(new { Success = false, message = "Cart Updated failed" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, response = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteCart")]
+        public IActionResult DeleteCart(int cartId)
+        {
+            try
+            {
+                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                if (this.cartBL.DeleteCart(cartId, userId))
+                {
+                    return this.Ok(new { success = true, message = "Book Deleted Successfully from Cart " });
+                }
+                else
+                {
+                    return this.BadRequest(new { Success = false, message = "Cart Deleted failed" });
                 }
             }
             catch (Exception ex)

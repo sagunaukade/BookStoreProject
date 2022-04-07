@@ -37,5 +37,17 @@ namespace BusinessLayer.Service
                 throw;
             }
         }
+
+        public bool DeleteCart(int cartId, int userId)
+        {
+            try
+            {
+                return this.cartRL.DeleteCart(cartId, userId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
