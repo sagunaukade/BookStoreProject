@@ -73,15 +73,18 @@ namespace RepositoryLayer.Service
                 SqlDataReader rd = com.ExecuteReader();
                 if (rd.HasRows)
                 {
+                    int UserId = 0;
                     UserLogin user = new UserLogin();
                     while (rd.Read())
                     {
                         user.Email = Convert.ToString(rd["Email"] == DBNull.Value ? default : rd["Email"]);
-                        user.FullName = Convert.ToString(rd["FullName"] == DBNull.Value ? default : rd["FullName"]);
+                       // user.FullName = Convert.ToString(rd["FullName"] == DBNull.Value ? default : rd["FullName"]);
+                        UserId = Convert.ToInt32(rd["UserId"] == DBNull.Value ? default : rd["UserId"]);
+
                     }
 
                     this.sqlConnection.Close();
-                    user.Token = this.GenerateJWTToken(user);
+                    user.Token = this.GenerateJWTToken(Email , UserId);
                     return user;
                 }
                 else
@@ -99,7 +102,7 @@ namespace RepositoryLayer.Service
                 this.sqlConnection.Close();
             }
         }
-        public string GenerateJWTToken(UserLogin user)
+        public string GenerateJWTToken(string Email , int userId)
         {
             // header
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Jwt:SecretKey"]));
@@ -108,9 +111,9 @@ namespace RepositoryLayer.Service
             // payload
             var claims = new[]
             {
-                new Claim(ClaimTypes.Role, "User"),
-                new Claim("Email", user.Email),
-                new Claim("Id", user.UserId.ToString()),
+               // new Claim(ClaimTypes.Role, "User"),
+                new Claim("Email", Email),
+                new Claim("Id", userId.ToString()),
             };
 
             // signature

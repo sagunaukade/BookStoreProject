@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interface;
 using CommonLayer.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -81,6 +82,29 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { Success = false, response = ex.Message });
             }
         }
+        [Authorize]
+        [HttpGet("{UserId}/GetCart")]
+        public IActionResult GetCart()
+        {
+            try
+            {
+                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                var cartData = this.cartBL.GetCartByUserId(userId);
+                if (cartData != null)
+                {
+                    return this.Ok(new { success = true, message = "Cart Data Fetched Successfully ", response = cartData });
+                }
+                else
+                {
+                    return this.BadRequest(new { Success = false, message = "Enter Valid UserId" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, response = ex.Message });
+            }
+        }
+
     }
 }
     

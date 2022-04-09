@@ -122,5 +122,56 @@ namespace RepositoryLayer.Service
                 this.sqlConnection.Close();
             }
         }
+        public List<CartModel> GetCartByUserId(int userId)
+        {
+            try
+            {
+                this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStore"]);
+                SqlCommand cmd = new SqlCommand("GetCartbyUserId", this.sqlConnection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                this.sqlConnection.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    List<CartModel> cartmodel = new List<CartModel>();
+                    while (reader.Read())
+                    {
+                        BookModel booksModel = new BookModel();
+                        CartModel cart = new CartModel();
+
+                        booksModel.BookName = reader["bookName"].ToString();
+                        booksModel.AuthorName = reader["authorName"].ToString();
+                        booksModel.OriginalPrice = Convert.ToDecimal(reader["originalPrice"]);
+                        booksModel.DiscountPrice = Convert.ToDecimal(reader["discountPrice"]);
+                        booksModel.BookImage = reader["bookImage"].ToString();
+                        cart.UserId = Convert.ToInt32(reader["UserId"]);
+                        cart.BookId = Convert.ToInt32(reader["BookId"]);
+                        cart.CartId = Convert.ToInt32(reader["CartId"]);
+                       // cart.Quantity = Convert.ToInt32(reader["Quantity"]);
+                       cart.Bookmodel = booksModel;
+                        cartmodel.Add(cart);
+                    }
+
+                    this.sqlConnection.Close();
+                    return cartmodel;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
     }
 }

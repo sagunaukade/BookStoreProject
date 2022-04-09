@@ -12,12 +12,11 @@ Email varchar(255),
 Password varchar(255),
 MobileNumber bigint)
 
-drop table Users;
 select * from Users;
 
 ----stored procedures for User Api
 ---Create procedured for User Registration
-Alter procedure UserRegister(
+Create procedure UserRegister(
 @FullName varchar(255),
 @Email varchar(255),
 @Password varchar(255),
@@ -40,20 +39,20 @@ where Email = @Email and Password = @Password
 End;
 
 ---Create procedured for User FOrgot Password
-Create procedure UserForgotPassword
+create procedure UserForgotPassword
 (
 @Email varchar(Max)
 )
 as
 begin
-Update Users 
+Update Users
 set Password = 'Null'
 where Email = @Email;
 select * from Users where Email = @Email;
 End;
 
 ---create procedure for user reset password 
-CREATE procedure UserResetPassword
+create procedure UserResetPassword
 (
 @Email varchar(Max),
 @Password varchar(Max)
@@ -67,50 +66,52 @@ WHERE Email = @Email;
 End;
 
 ---Create book table
-create table books(
+create table Books(
 BookId int identity (1,1)primary key,
 BookName varchar(255),
 AuthorName varchar(255),
 Rating int,
 TotalView int,
-OriginalPrice int,
-DiscountPrice int,
-BookDetails varchar(500),
-BookImage varchar(500))
+OriginalPrice decimal,
+DiscountPrice decimal,
+BookDetails varchar(255),
+BookImage varchar(255),
+);
 
-select * from books;
-
+drop table Books
+select * from  Books
 ----stored procedures for Book Api
 ---procedured to add book
-create procedure AddBook
+alter procedure AddBook
 (
-@bookName varchar(Max),
-@authorName varchar(250),
+@BookName varchar(255),
+@authorName varchar(255),
 @rating int,
 @totalView int,
 @originalPrice Decimal,
 @discountPrice Decimal,
-@BookDetails varchar(Max),
-@bookImage varchar(250)
+@BookDetails varchar(255),
+@bookImage varchar(255)
 )
 as
 BEGIN
-Insert into Books (bookName, authorName, rating, totalview, originalPrice, 
+Insert into Books(BookName, authorName, rating, totalview, originalPrice, 
 discountPrice, BookDetails, bookImage)
 values (@bookName, @authorName, @rating, @totalView ,@originalPrice, @discountPrice,
 @BookDetails, @bookImage);
 End;
 
+
 --procedure to updatebook
 create procedure UpdateBook
 (
 @bookId int,
-@bookName varchar(Max),
-@authorName varchar(250),
+@bookName varchar(255),
+@authorName varchar(255),
 @originalPrice Decimal,
 @discountPrice Decimal,
-@BookDetails varchar(Max),
-@bookImage varchar(250)
+@BookDetails varchar(255),
+@bookImage varchar(255)
 )
 as
 BEGIN
@@ -148,14 +149,13 @@ End;
 ---Create cart table
 create Table Carts
 (
-CartId INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-Quantity INT default 1,
-UserId INT FOREIGN KEY REFERENCES Users(UserId),
-BookId INT FOREIGN KEY REFERENCES Books(BookId) 
+	CartId INT IDENTITY(1,1) PRIMARY KEY,
+	Quantity INT,
+	UserId INT FOREIGN KEY REFERENCES Users(UserId),
+	BookId INT FOREIGN KEY REFERENCES Books(bookId)
 );
-drop table Carts
 select * from Carts;
-
+drop table Carts
 ---create procedure to addcart
 Alter Proc AddCart
 (
@@ -178,7 +178,7 @@ end
 End;
 
 ---create procedure to UpdateCart
-create procedure UpdateCart
+Alter procedure UpdateCart
 (
 @Quantity int,
 @BookId int,
@@ -193,7 +193,7 @@ where CartId = @CartId;
 End;
 
 ---Create procedure to deletecart
-Alter procedure DeleteCart
+alter procedure DeleteCart
 (
 @CartId int
 --@UserId int
@@ -204,3 +204,92 @@ Delete Carts
 where CartId = @CartId 
 --and UserId = @UserId;; 
 End;
+
+--create procedure to getcartbyuserid
+alter procedure GetCartbyUserId
+(
+@UserId int
+)
+as
+BEGIN
+Select c.CartId, c.Quantity, c.UserId,c.BookId,
+b.bookName, b.authorName, b.discountPrice, b.originalPrice, b.bookImage
+from Carts c
+inner join Books b on c.BookId = b.bookId
+where UserId = @UserId;
+End;
+
+EXEC GetCartbyUserId 3;
+
+--create address type table
+create Table AddressTypeTab
+(
+	TypeId INT IDENTITY(1,1) PRIMARY KEY,
+	AddressType varchar(255)
+);
+drop table AddressType
+select * from AddressTypeTab
+---insert record for addresstype table
+--insert into AddressType values('Home'),('Office'),('Other');
+insert into AddressTypeTab values ('Home')
+insert into AddressTypeTab values ('Office')
+insert into AddressTypeTab values ('Other')
+
+
+---create address table
+create table AddressTab(
+AddressId int identity(1,1) primary key,
+FullAddress varchar(255),
+AddressType int,
+City varchar(255),
+State varchar(255),
+TypeId int foreign key (TypeId) References AddressTypeTab(TypeId),
+UserId INT FOREIGN KEY (UserId) REFERENCES users(UserId),
+);
+
+select * from AddressTab
+
+drop table AddressTab
+
+---alter table AddressTab add constraint AddressTab_AddressType_FK foreign key (AddressType) References AddressTypeTab (AddressId)
+
+
+--create procedure to AddAddress
+-- Procedure To Add Address
+alter procedure AddAddress
+(
+	@FullAddress varchar(255),
+	@City varchar(255),
+	@State varchar(255),
+	@TypeId int,
+	@UserId int
+)
+as
+BEGIN
+If Exists (select * from AddressType where TypeId = @TypeId)
+begin
+Insert into Addresses values(@FullAddress, @City, @State, @TypeId, @UserId);
+end
+Else
+begin
+select 2
+end
+End;
+
+select * from Users
+select * from Books
+select * from Carts
+select * from Addresses
+
+sp_help users
+
+insert into Addresses(AddressId, FullAddress, City, State, TypeId, UserId) values(1,'Shivane','Pune','MH',1,2);
+
+SET IDENTITY_INSERT Addresses ON 
+delete from Addresses where AddressId = 0
+
+select * from Users
+select * from Books
+select * from Carts
+
+

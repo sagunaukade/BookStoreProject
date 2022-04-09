@@ -49,5 +49,17 @@ namespace BusinessLayer.Service
                 throw;
             }
         }
+
+        public List<CartModel> GetCartByUserId(int userId)
+        {
+            try
+            {
+                return this.cartRL.GetCartByUserId(userId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
