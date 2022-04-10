@@ -298,10 +298,6 @@ sp_help users
 SET IDENTITY_INSERT Addresses ON 
 delete from Addresses where AddressId = 0
 
-select * from Users
-select * from Books
-select * from Cart
-
 --create procedure for updateAddress
 alter proc UpdateAddress
 (
@@ -349,3 +345,37 @@ from AddressTable a1
 Inner join AddressTypeT a2 on a2.TypeId = a1.TypeId 
 where UserId = @UserId;
 END;
+
+---create wishlist table
+create Table Wishlist
+(
+WishlistId int identity(1,1) primary key,
+UserId INT FOREIGN KEY REFERENCES Users(UserId),
+bookId INT FOREIGN KEY REFERENCES Books(bookId)
+);
+
+select * from Wishlist
+---create procedure to Add in Wishlist
+create procedure AddInWishlist
+(
+	@UserId int,
+	@BookId int
+)
+as
+BEGIN
+If Exists (Select * from Wishlist where UserId = @UserId and bookId = @BookId)
+begin 
+select 2;
+end
+Else
+begin 
+if Exists (select * from Books where bookId = @BookId)
+begin
+Insert into Wishlist(UserId, bookId) values (@UserId , @BookId);
+end
+else
+begin
+select 1;
+end
+end
+End;
