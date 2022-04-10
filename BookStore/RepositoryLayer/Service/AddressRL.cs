@@ -56,7 +56,7 @@ namespace RepositoryLayer.Service
             }
         }
 
-        public AddressModel UpdateAddress(AddressModel add, int addressId, int userId)
+        public AddressModel UpdateAddress(AddressModel add,int AddressId)
         {
             try
             {
@@ -65,12 +65,11 @@ namespace RepositoryLayer.Service
                 {
                     CommandType = CommandType.StoredProcedure
                 };
-                cmd.Parameters.AddWithValue("@AddressId", addressId);
+                cmd.Parameters.AddWithValue("@AddressId", AddressId);
                 cmd.Parameters.AddWithValue("@FullAddress", add.FullAddress);
                 cmd.Parameters.AddWithValue("@City", add.City);
                 cmd.Parameters.AddWithValue("@State", add.State);
                 cmd.Parameters.AddWithValue("@TypeId", add.TypeId);
-                cmd.Parameters.AddWithValue("@UserId", userId);
                 this.sqlConnection.Open();
                 int i = cmd.ExecuteNonQuery();
                 this.sqlConnection.Close();
@@ -81,6 +80,39 @@ namespace RepositoryLayer.Service
                 else
                 {
                     return null;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
+
+        public bool DeleteAddress(int addressId)
+        {
+            try
+            {
+                this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStore"]);
+                SqlCommand cmd = new SqlCommand("DeleteAddress", this.sqlConnection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                cmd.Parameters.AddWithValue("@AddressId", addressId);
+                this.sqlConnection.Open();
+                int i = cmd.ExecuteNonQuery();
+                this.sqlConnection.Close();
+                if (i >= 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
             catch (Exception)

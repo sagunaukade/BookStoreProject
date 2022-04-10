@@ -82,7 +82,6 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { Success = false, response = ex.Message });
             }
         }
-        [Authorize]
         [HttpGet("{UserId}/GetCart")]
         public IActionResult GetCart()
         {

@@ -25,11 +25,22 @@ namespace BusinessLayer.Service
                 throw;
             }
         }
-        public AddressModel UpdateAddress(AddressModel add, int addressId, int userId)
+        public AddressModel UpdateAddress(AddressModel add, int AddressId)
         {
             try
             {
-                return this.addressRL.UpdateAddress(add, addressId, userId);
+                return this.addressRL.UpdateAddress(add,AddressId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public bool DeleteAddress(int addressId)
+        {
+            try
+            {
+                return this.addressRL.DeleteAddress(addressId);
             }
             catch (Exception)
             {

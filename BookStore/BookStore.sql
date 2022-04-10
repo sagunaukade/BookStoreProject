@@ -147,14 +147,17 @@ where bookId = @bookId;
 End;
 
 ---Create cart table
-create Table Carts
+create Table Cart
+
 (
-	CartId INT IDENTITY(1,1) PRIMARY KEY,
-	Quantity INT,
-	UserId INT FOREIGN KEY REFERENCES Users(UserId),
-	BookId INT FOREIGN KEY REFERENCES Books(bookId)
+CartId INT IDENTITY(1,1) PRIMARY KEY,
+Quantity INT
 );
-select * from Carts;
+
+alter table cart add UserId int  references Users (UserId)
+alter table cart add BookId int  references Books (BookId)
+
+select * from Cart;
 drop table Carts
 ---create procedure to addcart
 Alter Proc AddCart
@@ -162,13 +165,12 @@ Alter Proc AddCart
 @Quantity int,
 @UserId int,
 @BookId int
-
 )
 as
 BEGIN
 if(Exists (select * from Books where bookId = @BookId))
 begin
-Insert Into Carts (Quantity,UserId, BookId)
+Insert Into Cart(Quantity,UserId, BookId)
 Values (@Quantity,@UserId, @BookId);
 end
 else
@@ -186,7 +188,7 @@ Alter procedure UpdateCart
 )
 as
 BEGIN
-update Carts 
+update Cart 
 set BookId = @BookId,
 Quantity = @Quantity 
 where CartId = @CartId;
@@ -196,79 +198,128 @@ End;
 alter procedure DeleteCart
 (
 @CartId int
---@UserId int
 )
 as
 BEGIN
-Delete Carts 
+Delete Cart 
 where CartId = @CartId 
---and UserId = @UserId;; 
 End;
 
 --create procedure to getcartbyuserid
-alter procedure GetCartbyUserId
+create Proc GetCartbyUserId
 (
 @UserId int
 )
 as
 BEGIN
-Select c.CartId, c.Quantity, c.UserId,c.BookId,
-b.bookName, b.authorName, b.discountPrice, b.originalPrice, b.bookImage
-from Carts c
-inner join Books b on c.BookId = b.bookId
+Select CartId, Quantity, UserId,c.BookId,
+bookName, authorName, discountPrice, originalPrice, bookImage
+from Cart c
+join Books b on
+c.BookId = b.bookId
 where UserId = @UserId;
 End;
 
+select * from Users
 EXEC GetCartbyUserId 3;
 
+Alter PROC GetCartbyUserId
+(
+@userId INT
+)
+AS
+BEGIN
+SELECT 
+c.cartId,
+b.BookName,
+b.AuthorName,
+b.discountPrice,
+b.DiscountPrice,
+b.OriginalPrice,
+b.BookImage
+FROM [Cart] AS c
+LEFT JOIN [Books] AS b ON c.BookId = b.BookId
+WHERE c.UserId = @userId 
+END
+
 --create address type table
-create Table AddressTypeTab
+create Table AddressTypeT
 (
 	TypeId INT IDENTITY(1,1) PRIMARY KEY,
-	AddressType varchar(255)
+	TypeName varchar(255)
 );
-drop table AddressType
-select * from AddressTypeTab
----insert record for addresstype table
---insert into AddressType values('Home'),('Office'),('Other');
-insert into AddressTypeTab values ('Home')
-insert into AddressTypeTab values ('Office')
-insert into AddressTypeTab values ('Other')
 
+select * from AddressTypeT
+
+---insert record for addresstype table
+insert into AddressTypeT values('Home'),('Office'),('Other');
 
 ---create address table
-create table AddressTab(
-AddressId int identity(1,1) primary key,
+create Table AddressTable
+(
+AddressId INT IDENTITY(1,1) PRIMARY KEY,
 FullAddress varchar(255),
-AddressType int,
-City varchar(255),
-State varchar(255),
-TypeId int foreign key (TypeId) References AddressTypeTab(TypeId),
-UserId INT FOREIGN KEY (UserId) REFERENCES users(UserId),
+City varchar(100),
+State varchar(100),
+TypeId int 
+FOREIGN KEY (TypeId) REFERENCES AddressTypeT(TypeId),
+UserId INT FOREIGN KEY (UserId) REFERENCES Users(UserId)
 );
-
-select * from AddressTab
-
-drop table AddressTab
-
----alter table AddressTab add constraint AddressTab_AddressType_FK foreign key (AddressType) References AddressTypeTab (AddressId)
-
+select * from AddressTable
 
 --create procedure to AddAddress
 -- Procedure To Add Address
 alter procedure AddAddress
 (
-	@FullAddress varchar(255),
-	@City varchar(255),
-	@State varchar(255),
-	@TypeId int,
-	@UserId int
+@FullAddress varchar(max),
+@City varchar(100),
+@State varchar(100),
+@TypeId int,
+@UserId int
 )
 as
 BEGIN
-If Exists (select * from AddressType where TypeId = @TypeId)
+If Exists (select * from AddressTypeT where TypeId = @TypeId)
 begin
-Insert into Addresses values(@FullAddress, @City, @State, @TypeId, @UserId);
+Insert into AddressTable 
+values(@FullAddress, @City, @State, @TypeId, @UserId);
+end
+Else
+begin
+select 2
+end
+End;
+select * from Users
+select * from Books
+select * from Cart
+
+sp_help users
+
+SET IDENTITY_INSERT Addresses ON 
+delete from Addresses where AddressId = 0
+
+select * from Users
+select * from Books
+select * from Cart
+
+--create procedure for updateAddress
+alter proc UpdateAddress
+(
+	@AddressId int,
+	@FullAddress varchar(max),
+	@City varchar(100),
+	@State varchar(100),
+	@TypeId int
+	--@UserId int
+)
+as
+BEGIN
+If Exists (select * from AddressTypeT where TypeId = @TypeId)
+begin
+Update AddressTable set
+FullAddress = @FullAddress, City = @City,
+State = @State , TypeId = @TypeId
+where AddressId = @AddressId
 end
 Else
 begin
@@ -276,20 +327,12 @@ select 2
 end
 End;
 
-select * from Users
-select * from Books
-select * from Carts
-select * from Addresses
-
-sp_help users
-
-insert into Addresses(AddressId, FullAddress, City, State, TypeId, UserId) values(1,'Shivane','Pune','MH',1,2);
-
-SET IDENTITY_INSERT Addresses ON 
-delete from Addresses where AddressId = 0
-
-select * from Users
-select * from Books
-select * from Carts
-
-
+--create procedure to delete address
+create Procedure DeleteAddress
+(
+@AddressId int
+)
+as
+BEGIN
+Delete AddressTable where AddressId = @AddressId 
+End;

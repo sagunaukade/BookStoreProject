@@ -39,12 +39,12 @@ namespace BookStore.Controllers
             }
         }
         [HttpPut("UpdateAddress")]
-        public IActionResult UpdateAddress(AddressModel address, int addressId)
+        public IActionResult UpdateAddress(AddressModel address,int AddressId)
         {
             try
             {
                 var userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
-                var addData = this.addressBL.UpdateAddress(address, addressId, userId);
+                var addData = this.addressBL.UpdateAddress(address,AddressId);
                 if (addData != null)
                 {
                     return this.Ok(new { Status = true, Message = "Address Updated Successfully", Response = addData });
@@ -59,5 +59,26 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { status = false, Response = ex.Message });
             }
         }
+        [HttpDelete("DeleteAddress")]
+        public IActionResult DeleteAddress(int addressId)
+        {
+            try
+            {
+                var userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                if (this.addressBL.DeleteAddress(addressId))
+                {
+                    return this.Ok(new { Status = true, Message = "Address Deleted Successfully" });
+                }
+                else
+                {
+                    return this.BadRequest(new { Status = false, Message = "Enter Correct Address Id" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { status = false, Response = ex.Message });
+            }
+        }
+
     }
 }
