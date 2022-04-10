@@ -124,5 +124,50 @@ namespace RepositoryLayer.Service
                 this.sqlConnection.Close();
             }
         }
+        public List<AddressModel> GetAllAddress(int userId)
+        {
+            try
+            {
+                this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStore"]);
+                SqlCommand cmd = new SqlCommand("GetAllAddress", this.sqlConnection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                this.sqlConnection.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    List<AddressModel> addressModel = new List<AddressModel>();
+                    while (reader.Read())
+                    {
+                        addressModel.Add(new AddressModel
+                        {
+                            FullAddress = reader["FullAddress"].ToString(),
+                            City = reader["City"].ToString(),
+                            State = reader["State"].ToString(),
+                            TypeId = Convert.ToInt32(reader["TypeId"]),
+                            UserId = Convert.ToInt32(reader["UserId"])
+                        });
+                    }
+
+                    this.sqlConnection.Close();
+                    return addressModel;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
     }
 }

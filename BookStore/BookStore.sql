@@ -336,3 +336,16 @@ as
 BEGIN
 Delete AddressTable where AddressId = @AddressId 
 End;
+
+-- Procedure To Get All Address
+create Procedure GetAllAddress
+(
+@UserId int
+)
+as
+BEGIN
+Select FullAddress, City, State,a1.UserId, a2.TypeId
+from AddressTable a1
+Inner join AddressTypeT a2 on a2.TypeId = a1.TypeId 
+where UserId = @UserId;
+END;
