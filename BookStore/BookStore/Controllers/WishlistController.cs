@@ -24,7 +24,7 @@ namespace BookStore.Controllers
             {
                 int userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
                 var result = this.wishlistBL.AddInWishlist(bookId, userId);
-                if (result.Equals("Book added in Wishlist"))
+                if (result.Equals("Successfully Book added in Wishlist"))
                 {
                     return this.Ok(new { Status = true, Message = result });
                 }
@@ -35,6 +35,26 @@ namespace BookStore.Controllers
                 else
                 {
                     return this.BadRequest(new { Status = false, Message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, message = ex.Message });
+            }
+        }
+        [HttpDelete("DeleteFromWishlist")]
+        public IActionResult DeleteFromWishlist(int wishlistId)
+        {
+            try
+            {
+                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                if (this.wishlistBL.DeleteFromWishlist(userId, wishlistId))
+                {
+                    return this.Ok(new { Status = true, Message = "Successfully Deleted From Wishlist" });
+                }
+                else
+                {
+                    return this.BadRequest(new { Status = false, Message = "Something Went Wrong" });
                 }
             }
             catch (Exception ex)

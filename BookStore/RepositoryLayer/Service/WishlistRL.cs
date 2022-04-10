@@ -42,7 +42,7 @@ namespace RepositoryLayer.Service
                 }
                 else
                 {
-                    return "Book Added in Wishlist";
+                    return "Successfully Book Added in Wishlist";
                 }
             }
             catch (Exception)
@@ -54,7 +54,37 @@ namespace RepositoryLayer.Service
                 this.sqlConnection.Close();
             }
         }
-
-
+        public bool DeleteFromWishlist(int userId, int wishlistId)
+        {
+            try
+            {
+                this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStore"]);
+                SqlCommand cmd = new SqlCommand("DeleteFromWishlist", this.sqlConnection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@WishlistId", wishlistId);
+                this.sqlConnection.Open();
+                int i = cmd.ExecuteNonQuery();
+                this.sqlConnection.Close();
+                if (i >= 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
     }
 }

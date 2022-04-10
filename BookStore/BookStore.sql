@@ -379,3 +379,14 @@ select 1;
 end
 end
 End;
+
+--create procedure to delete from wishlist
+create procedure DeleteFromWishlist
+(
+@WishlistId int,
+@UserId int
+)
+as
+BEGIN 
+Delete Wishlist where WishlistId = @WishlistId and UserId = @UserId;
+End;	 
