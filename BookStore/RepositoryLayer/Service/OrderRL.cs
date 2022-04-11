@@ -58,5 +58,50 @@ namespace RepositoryLayer.Service
                 this.sqlConnection.Close();
             }
         }
+        public List<OrderModel> GetAllOrder(int userId)
+        {
+            try
+            {
+                this.sqlConnection = new SqlConnection(this.Configuration["ConnectionString:BookStore"]);
+                SqlCommand cmd = new SqlCommand("GetAllOrders", this.sqlConnection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                this.sqlConnection.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    List<OrderModel> orderModels = new List<OrderModel>();
+                    while (reader.Read())
+                    {
+                        OrderModel orderModel = new OrderModel();
+                        orderModel.OrderId = Convert.ToInt32(reader["OrderId"]);
+                        orderModel.UserId = Convert.ToInt32(reader["UserId"]);
+                        orderModel.BookId = Convert.ToInt32(reader["bookId"]);
+                        orderModel.AddressId = Convert.ToInt32(reader["AddressId"]);
+                        orderModel.TotalPrice = Convert.ToInt32(reader["TotalPrice"]);
+                        orderModel.Quantity = Convert.ToInt32(reader["BookQuantity"]);
+                        orderModel.OrderDate = Convert.ToDateTime(reader["OrderDate"]);
+                        orderModels.Add(orderModel);
+                    }
+                    this.sqlConnection.Close();
+                    return orderModels;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                this.sqlConnection.Close();
+            }
+        }
     }
 }

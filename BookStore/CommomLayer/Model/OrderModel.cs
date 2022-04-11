@@ -13,7 +13,6 @@ namespace CommonLayer.Model
         public int TotalPrice { get; set; }
         public int Quantity { get; set; }
         public DateTime? OrderDate { get; set; }
-        public BookModel BookModel { get; set; }
         public int BookCount { get; set; }
     }
 }

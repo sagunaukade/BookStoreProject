@@ -464,6 +464,24 @@ Select 2;
 End
 END;
 
+
+--create procedure for get all orders
+alter procedure GetAllOrders
+(
+@UserId int
+)
+as
+begin
+Select 
+O.OrderId, O.UserId, O.AddressId, b.bookId,
+O.TotalPrice, O.BookQuantity, O.OrderDate,
+b.bookName, b.AuthorName, b.bookImage
+FROM Books b
+join OrderTable O on O.bookId = b.bookId 
+where 
+O.UserId = @UserId;
+END
+
 select * from OrderTable
 select * from Books
 Select * from Cart

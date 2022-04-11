@@ -30,12 +30,34 @@ namespace BookStore.Controllers
                 }
                 else 
                 {
-                   return this.BadRequest(new { Status = false, Message = "Enter Correct BookId" });
+                   return this.BadRequest(new { Status = false, Message = "Enter Valid BookId" });
                 }
             }
             catch (Exception ex)
             {
                 return this.BadRequest(new { Status = false, Message = ex.Message });
+            }
+        }
+        
+        [HttpGet("GetAllOrders")]
+        public IActionResult GetAllOrders()
+        {
+            try
+            {
+                var userId = Convert.ToInt32(User.Claims.FirstOrDefault(u => u.Type == "Id").Value);
+                var orderData = this.orderBL.GetAllOrder(userId);
+                if (orderData != null)
+                {
+                    return this.Ok(new { Status = true, Message = "Order Fetched Successfully", Response = orderData });
+                }
+                else
+                {
+                    return this.BadRequest(new { Status = false, Message = "Please First Login" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Status = false, ex.Message });
             }
         }
     }
