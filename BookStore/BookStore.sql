@@ -390,3 +390,19 @@ as
 BEGIN 
 Delete Wishlist where WishlistId = @WishlistId and UserId = @UserId;
 End;	 
+
+---create procedure to get all records from wishlist
+Alter procedure GetAllRecordFromWishlist
+(
+@UserId int
+)
+as
+BEGIN
+select w.WishlistId,w.UserId,w.bookId,
+b.bookName,b.authorName,b.discountPrice,b.originalPrice,
+b.bookImage
+from Wishlist w
+join Books b
+on w.bookId = b.bookId
+where UserId = @UserId;
+END;

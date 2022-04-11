@@ -62,6 +62,27 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { Success = false, message = ex.Message });
             }
         }
+        [HttpGet("{UserId}/ GetAllRecordFromWishlist")]
+        public IActionResult GetAllRecordFromWishlist()
+        {
+            try
+            {
+                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                var wishData = this.wishlistBL.GetAllFromWishlist(userId);
+                if (wishData != null)
+                {
+                    return this.Ok(new { success = true, message = "All Wishlist Records Fetched Successfully ", response = wishData });
+                }
+                else
+                {
+                    return this.BadRequest(new { Success = false, message = "Enter Valid UserId" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, response = ex.Message });
+            }
+        }
     }
 }
 
