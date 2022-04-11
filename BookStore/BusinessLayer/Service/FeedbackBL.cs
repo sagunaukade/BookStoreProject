@@ -26,5 +26,39 @@ namespace BusinessLayer.Service
                 throw;
             }
         }
+        public string UpdateFeedback(FeedbackModel feedback, int userId)
+        {
+            try
+            {
+                return this.feedbackRL.UpdateFeedback(feedback, userId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public bool DeleteFeedback(int feedbackId, int userId)
+        {
+            try
+            {
+                return this.feedbackRL.DeleteFeedback(feedbackId, userId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public List<GetFeedBackModel> GetRecordsByBookId(int bookId)
+        {
+            try
+            {
+                return this.feedbackRL.GetRecordsByBookId(bookId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
