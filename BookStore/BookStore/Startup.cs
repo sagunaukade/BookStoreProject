@@ -51,6 +51,9 @@ namespace BookStore
 
             services.AddTransient<IOrderRL, OrderRL>();
             services.AddTransient<IOrderBL, OrderBL>();
+
+            services.AddTransient<IFeedbackBL, FeedbackBL>();
+            services.AddTransient<IFeedbackRL, FeedbackRL>();
 ;
             // Adding Swagger 
             services.AddSwaggerGen(c =>
@@ -115,7 +118,6 @@ namespace BookStore
             {
                 endpoints.MapControllers();
             });
-
         }
     }
 }

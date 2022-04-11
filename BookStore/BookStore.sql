@@ -402,7 +402,7 @@ select w.WishlistId,w.UserId,w.bookId,
 b.bookName,b.authorName,b.discountPrice,b.originalPrice,
 b.bookImage
 from Wishlist w
-join Books b
+right join Books b
 on w.bookId = b.bookId
 where UserId = @UserId;
 END;
@@ -477,7 +477,7 @@ O.OrderId, O.UserId, O.AddressId, b.bookId,
 O.TotalPrice, O.BookQuantity, O.OrderDate,
 b.bookName, b.AuthorName, b.bookImage
 FROM Books b
-join OrderTable O on O.bookId = b.bookId 
+left join OrderTable O on O.bookId = b.bookId 
 where 
 O.UserId = @UserId;
 END
@@ -487,3 +487,53 @@ select * from Books
 Select * from Cart
 Select * from AddressTable
 Select * from Wishlist
+
+
+--create feedback table 
+create Table FeedbackTable
+(
+FeedbackId INT PRIMARY KEY IDENTITY(1,1),
+Reviews varchar(255),
+Comment varchar(255),
+Rating int,
+Totalrating int,
+bookId int FOREIGN KEY (bookId) REFERENCES Books(bookId),
+UserId int FOREIGN KEY (UserId) REFERENCES Users(UserId)
+);
+select * from FeedbackTable
+create Proc AddFeedback
+(
+@Reviews varchar(255),
+	@Comment varchar(255),
+	@Rating int,
+	@Totalrating int,
+	@BookId int,
+	@UserId int
+)
+as
+Declare @AverageRating int;
+BEGIN
+IF (EXISTS(SELECT * FROM FeedbackTable WHERE bookId = @BookId and UserId=@UserId))
+select 1;
+Else
+Begin
+IF (EXISTS(SELECT * FROM Books WHERE bookId = @BookId))
+Begin  select * from FeedbackTable
+Begin try
+Begin transaction
+Insert into FeedbackTable(Reviews,Comment, Rating, bookId, UserId) values(@Reviews,@Comment, @Rating, @BookId, @UserId);		
+set @AverageRating = (Select AVG(Rating) from FeedbackTable where bookId = @BookId);
+Update FeedbackTable set rating = @AverageRating, Totalrating = @Totalrating + 1 
+where  bookId = @BookId;
+Commit Transaction
+End Try
+Begin catch
+Rollback transaction
+End catch
+End
+Else
+Begin
+Select 2; 
+End
+End
+END;
