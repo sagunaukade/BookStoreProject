@@ -406,3 +406,66 @@ join Books b
 on w.bookId = b.bookId
 where UserId = @UserId;
 END;
+
+---create order table
+create table OrderTable
+(
+OrderId int primary key identity(1,1),
+TotalPrice int,
+BookQuantity int,
+OrderDate Date,
+BookCount int,
+UserId int FOREIGN KEY (UserId) REFERENCES Users(UserId),
+bookId int FOREIGN KEY (bookId) REFERENCES Books(bookId),
+AddressId int FOREIGN KEY (AddressId) REFERENCES AddressTable(AddressId)
+);
+
+select * from OrderTable
+--create procedure for order API
+--create procedure for AddOrder API
+create procedure AddOrder
+(
+@BookQuantity int,
+@UserId int,
+@BookId int,
+@AddressId int,
+@BookCount int
+)
+as
+Declare @TotalPrice int
+BEGIN
+set @TotalPrice = (select discountPrice from Books where bookId = @BookId);
+If(Exists(Select * from Books where bookId = @BookId))
+BEGIN
+If(Exists (Select * from Users where UserId = @UserId))
+BEGIN
+Begin try
+Begin Transaction
+Insert Into OrderTable (TotalPrice, BookQuantity, OrderDate, UserId, bookId, AddressId, BookCount)
+Values(@TotalPrice*@BookQuantity, @BookQuantity, GETDATE(), @UserId, @BookId, @AddressId,@BookCount);
+Update OrderTable set BookCount=BookCount
+where bookId = @BookId;
+Delete from Cart where BookId = @BookId and UserId = @UserId;
+select * from OrderTable;
+commit Transaction
+End try
+Begin Catch
+rollback;
+End Catch
+END
+Else
+Begin
+Select 3;
+End
+End
+Else
+Begin
+Select 2;
+End
+END;
+
+select * from OrderTable
+select * from Books
+Select * from Cart
+Select * from AddressTable
+Select * from Wishlist
