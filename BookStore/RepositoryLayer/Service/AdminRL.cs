@@ -64,7 +64,6 @@ namespace RepositoryLayer.Service
             // header
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Jwt:SecretKey"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
             // payload
             var claims = new[]
             {
@@ -72,7 +71,6 @@ namespace RepositoryLayer.Service
                 new Claim("Email", admin.Email),
                 new Claim("AdminId", admin.AdminId.ToString())
             };
-
             // signature
             var token = new JwtSecurityToken(
             this.Configuration["Jwt:Issuer"],
