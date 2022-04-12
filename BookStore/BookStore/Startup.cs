@@ -54,6 +54,9 @@ namespace BookStore
 
             services.AddTransient<IFeedbackBL, FeedbackBL>();
             services.AddTransient<IFeedbackRL, FeedbackRL>();
+
+            services.AddTransient<IAdminBL, AdminBL>();
+            services.AddTransient<IAdminRL, AdminRL>();
 ;
             // Adding Swagger 
             services.AddSwaggerGen(c =>
@@ -97,6 +100,11 @@ namespace BookStore
                   IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Configuration["Jwt:SecretKey"])) // Configuration["JwtToken:SecretKey"]
                };
           });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
+            });
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

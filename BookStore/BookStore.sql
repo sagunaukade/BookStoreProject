@@ -585,14 +585,49 @@ END;
 --create procedure to get all feedback
 alter Proc GetAllFeedback
 (
-	@BookId int
+@BookId int
 )
 as
 BEGIN
-	Select FeedbackId, Comment, Rating, bookId, u.FullName
-	From Users u
-	left Join FeedbackTable f
-	on f.UserId = u.UserId
-	where
-	 BookId = @BookId;
+Select FeedbackId, Comment, Rating, bookId, u.FullName
+From Users u
+left Join FeedbackTable f
+on f.UserId = u.UserId
+where
+	BookId = @BookId;
+END;
+
+---create Admin Table
+create Table AdminTable
+(
+AdminId int primary key identity(1,1),
+FullName varchar(255),
+Email varchar(255),
+Password varchar(255),
+PhoneNumber Bigint
+);
+
+--insert value Admin table
+Insert into AdminTable values('Admin', 'usagu2020@gmail.com', 'Sagu@123', '9112241587');
+select * from AdminTable
+
+---alter book table
+Alter table Books Add AdminId int Foreign key(AdminId) References AdminTable(AdminId);
+
+---create procedure for admin login
+create procedure LoginAdmin
+(
+@Email varchar(255),
+@Password varchar(255)
+)
+as
+BEGIN
+If(Exists(select * from AdminTable where Email = @Email and Password = @Password))
+Begin
+select AdminId, FullName, Email, PhoneNumber from AdminTable;
+end
+Else
+Begin
+select 2;
+End
 END;

@@ -14,10 +14,7 @@ namespace RepositoryLayer.Service
 {
     public class UserRL : IUserRL
     {
-
         private SqlConnection sqlConnection;
-
-
         public UserRL(IConfiguration configuration)
         {
             this.Configuration = configuration;
@@ -77,14 +74,14 @@ namespace RepositoryLayer.Service
                     UserLogin user = new UserLogin();
                     while (rd.Read())
                     {
-                        user.Email = Convert.ToString(rd["Email"] == DBNull.Value ? default : rd["Email"]);
-                       // user.FullName = Convert.ToString(rd["FullName"] == DBNull.Value ? default : rd["FullName"]);
-                        UserId = Convert.ToInt32(rd["UserId"] == DBNull.Value ? default : rd["UserId"]);
+                       user.Email = Convert.ToString(rd["Email"] == DBNull.Value ? default : rd["Email"]);
+                       user.FullName = Convert.ToString(rd["FullName"] == DBNull.Value ? default : rd["FullName"]);
+                       UserId = Convert.ToInt32(rd["UserId"] == DBNull.Value ? default : rd["UserId"]);
 
                     }
 
                     this.sqlConnection.Close();
-                    user.Token = this.GenerateJWTToken(Email , UserId);
+                    user.Token = this.GenerateJWTToken(Email, UserId);
                     return user;
                 }
                 else
@@ -111,13 +108,13 @@ namespace RepositoryLayer.Service
             // payload
             var claims = new[]
             {
-               // new Claim(ClaimTypes.Role, "User"),
+                new Claim(ClaimTypes.Role, "User"),
                 new Claim("Email", Email),
                 new Claim("Id", userId.ToString()),
             };
 
             // signature
-            var token = new JwtSecurityToken(
+                var token = new JwtSecurityToken(
                 this.Configuration["Jwt:Issuer"],
                 this.Configuration["Jwt:Issuer"],
                 claims,
