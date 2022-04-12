@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 namespace BookStore.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = Role.User)]
     [ApiController]
     public class WishListController : ControllerBase
     {
@@ -85,4 +87,3 @@ namespace BookStore.Controllers
         }
     }
 }
-
