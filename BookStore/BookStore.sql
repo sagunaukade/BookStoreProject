@@ -301,12 +301,12 @@ delete from Addresses where AddressId = 0
 --create procedure for updateAddress
 alter proc UpdateAddress
 (
-	@AddressId int,
-	@FullAddress varchar(max),
-	@City varchar(100),
-	@State varchar(100),
-	@TypeId int
-	--@UserId int
+@AddressId int,
+@FullAddress varchar(max),
+@City varchar(100),
+@State varchar(100),
+@TypeId int
+--@UserId int
 )
 as
 BEGIN

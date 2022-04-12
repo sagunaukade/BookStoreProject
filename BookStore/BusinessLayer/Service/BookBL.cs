@@ -25,7 +25,6 @@ namespace BusinessLayer.Service
                 throw;
             }
         }
-
         public UpdateBook UpdateBook(UpdateBook update)
         {
             try
@@ -48,7 +47,6 @@ namespace BusinessLayer.Service
                 throw;
             }
         }
-
         public BookModel GetBookByBookId(int BookId)
         {
             try
