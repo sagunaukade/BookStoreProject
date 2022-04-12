@@ -8,6 +8,5 @@ namespace RepositoryLayer.Interface
     public interface IAdminRL
     {
         public AdminLogin AdminLogin(string email, string password);
-
     }
 }
