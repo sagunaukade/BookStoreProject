@@ -2,9 +2,13 @@
 using CommonLayer.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BookStore.Controllers
@@ -14,9 +18,13 @@ namespace BookStore.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookBL bookBL;
-        public BookController(IBookBL bookBL)
+        private readonly IMemoryCache memoryCache;
+        private readonly IDistributedCache distributedCache;
+        public BookController(IBookBL bookBL, IMemoryCache memoryCache, IDistributedCache distributedCache)
         {
             this.bookBL = bookBL;
+            this.memoryCache = memoryCache;
+            this.distributedCache = distributedCache;
         }
         [Authorize(Roles = Role.Admin)]
         [HttpPost("AddBook")]
@@ -101,7 +109,50 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { Success = false, message = ex.Message });
             }
         }
+        [Authorize(Roles = Role.User)]
+        [HttpGet("GetAllBook")]
+        public IActionResult GetBook()
+        {
+            try
+            {
+                var updatedBookDetail = this.bookBL.GetAllBooks();
+                if (updatedBookDetail != null)
+                {
+                    return this.Ok(new { Success = true, message = "Book Detail Fetched Sucessfully", Response = updatedBookDetail });
+                }
+                else
+                {
+                    return this.BadRequest(new { Success = false, message = "Enter Valid Book Id" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { Success = false, message = ex.Message });
+            }
+        }
+        [HttpGet("redis")]
+        public async Task<IActionResult> GetAllBooksUsingRedisCache()
+        {
+            var cacheKey = "BookList";
+            string serializedBookList;
+            var BookList = new List<BookModel>();
+            var redisBookList = await distributedCache.GetAsync(cacheKey);
+            if (redisBookList != null)
+            {
+                serializedBookList = Encoding.UTF8.GetString(redisBookList);
+                BookList = JsonConvert.DeserializeObject<List<BookModel>>(serializedBookList);
+            }
+            else
+            {
+                BookList = (List<BookModel>)bookBL.GetAllBooks();
+                serializedBookList = JsonConvert.SerializeObject(BookList);
+                redisBookList = Encoding.UTF8.GetBytes(serializedBookList);
+                var options = new DistributedCacheEntryOptions()
+                    .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                await distributedCache.SetAsync(cacheKey, redisBookList, options);
+            }
+            return Ok(BookList);
+        }
     }
 }
-
-            

@@ -1,9 +1,14 @@
 ﻿using BusinessLayer.Interface;
+using CommonLayer.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BookStore.Controllers
@@ -14,10 +19,14 @@ namespace BookStore.Controllers
     public class WishListController : ControllerBase
     {
         private readonly IWishlistBL wishlistBL;
+        private readonly IMemoryCache memoryCache;
+        private readonly IDistributedCache distributedCache;
 
-        public WishListController(IWishlistBL wishlistBL)
+        public WishListController(IWishlistBL wishlistBL, IMemoryCache memoryCache, IDistributedCache distributedCache)
         {
             this.wishlistBL = wishlistBL;
+            this.memoryCache = memoryCache;
+            this.distributedCache = distributedCache;
         }
         [HttpPost("AddWishlist")]
         public IActionResult AddInWishlist(int bookId)
@@ -84,6 +93,31 @@ namespace BookStore.Controllers
             {
                 return this.BadRequest(new { Success = false, response = ex.Message });
             }
+        }
+        [HttpGet("redis")]
+        public async Task<IActionResult> GetAllBooksUsingRedisCache()
+        {
+            var cacheKey = "WishList";
+            string serializedWishList;
+            var WishList = new List<WishlistModel>();
+            var redisWishList = await distributedCache.GetAsync(cacheKey);
+            if (redisWishList != null)
+            {
+                serializedWishList = Encoding.UTF8.GetString(redisWishList);
+                WishList = JsonConvert.DeserializeObject<List<WishlistModel>>(serializedWishList);
+            }
+            else
+            {
+                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                WishList = (List<WishlistModel>)wishlistBL.GetAllFromWishlist(userId);
+                serializedWishList = JsonConvert.SerializeObject(WishList);
+                redisWishList = Encoding.UTF8.GetBytes(serializedWishList);
+                var options = new DistributedCacheEntryOptions()
+                    .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                await distributedCache.SetAsync(cacheKey, redisWishList, options);
+            }
+            return Ok(WishList);
         }
     }
 }

@@ -57,7 +57,14 @@ namespace BookStore
 
             services.AddTransient<IAdminBL, AdminBL>();
             services.AddTransient<IAdminRL, AdminRL>();
-;
+            services.AddMemoryCache();
+
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
+            ;
             // Adding Swagger 
             services.AddSwaggerGen(c =>
             {
@@ -113,7 +120,7 @@ namespace BookStore
                 app.UseDeveloperExceptionPage();
             }
             app.UseHttpsRedirection();
-
+            
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
