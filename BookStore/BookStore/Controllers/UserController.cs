@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interface;
 using CommonLayer.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace BookStore.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserBL userBL;
+        const string SessionFullName = "FullName";
+        const string SessionEmail = "Email";
         public UserController(IUserBL userBL)
         {
             this.userBL = userBL;
@@ -22,9 +25,13 @@ namespace BookStore.Controllers
         {
             try
             {
+                HttpContext.Session.SetString(SessionFullName, userRegistration.Fullname);
+                HttpContext.Session.SetString(SessionEmail, userRegistration.Email);
                 var user = this.userBL.Register(userRegistration);
                 if (user != null)
                 {
+                    var name = HttpContext.Session.GetString(SessionFullName);
+                    var email = HttpContext.Session.GetString(SessionEmail);
                     return this.Ok(new { Success = true, message = "User Added Sucessfully", Response = user });
                 }
                 else

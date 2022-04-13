@@ -89,6 +89,10 @@ namespace BookStore
                 });
 
             });
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+            });
 
             services.AddAuthentication(option =>
             {
