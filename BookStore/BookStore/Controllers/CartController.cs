@@ -2,9 +2,13 @@
 using CommonLayer.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BookStore.Controllers
@@ -14,9 +18,13 @@ namespace BookStore.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartBL cartBL;
-        public CartController(ICartBL cartBL)
+        private readonly IMemoryCache memoryCache;
+        private readonly IDistributedCache distributedCache;
+        public CartController(ICartBL cartBL, IMemoryCache memoryCache, IDistributedCache distributedCache)
         {
             this.cartBL = cartBL;
+            this.memoryCache = memoryCache;
+            this.distributedCache = distributedCache;
         }
         [Authorize(Roles = Role.User)]
         [HttpPost("AddCart")]
@@ -105,7 +113,31 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { Success = false, response = ex.Message });
             }
         }
-
+        [HttpGet("redis")]
+        public async Task<IActionResult> GetAllBooksUsingRedisCache()
+        {
+            var cacheKey = "CartList";
+            string serializedCartList;
+            var CartList = new List<CartModel>();
+            var redisCartList = await distributedCache.GetAsync(cacheKey);
+            if (redisCartList != null)
+            {
+                serializedCartList = Encoding.UTF8.GetString(redisCartList);
+                CartList = JsonConvert.DeserializeObject<List<CartModel>>(serializedCartList);
+            }
+            else
+            {
+                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "Id").Value);
+                CartList = (List<CartModel>)cartBL.GetCartByUserId(userId);
+                serializedCartList = JsonConvert.SerializeObject(CartList);
+                redisCartList = Encoding.UTF8.GetBytes(serializedCartList);
+                var options = new DistributedCacheEntryOptions()
+                    .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                await distributedCache.SetAsync(cacheKey, redisCartList, options);
+            }
+            return Ok(CartList);
+        }
     }
 }
     

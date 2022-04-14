@@ -95,7 +95,7 @@ namespace BookStore.Controllers
             }
         }
         [HttpGet("redis")]
-        public async Task<IActionResult> GetAllBooksUsingRedisCache()
+        public async Task<IActionResult> GetAllWishlistsUsingRedisCache()
         {
             var cacheKey = "WishList";
             string serializedWishList;
